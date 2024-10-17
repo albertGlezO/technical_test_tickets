@@ -1,0 +1,48 @@
+version: "3.5"
+
+volumes:
+ tickets-db:
+
+networks:
+  fluxit:
+   name: tickets
+
+services:
+  database:
+   container_name: tickets_db
+   image: mysql:5.7
+   restart: always
+   hostname: database
+   networks:
+     - fluxit
+   environment:
+     MYSQL_DATABASE: tickets
+     MYSQL_USER: us3r_71ck375
+     MYSQL_PASSWORD: p4ss_71ck375
+     MYSQL_ROOT_PASSWORD: p4ss_r007
+   ports:
+     - "3307:3306"
+   expose:
+     - "3306"
+   volumes:
+     - tickets-db:/var/lib/mysql
+
+  server:
+    container_name: tickets
+    build: .
+    hostname: tickets
+    networks:
+      - fluxit
+    ports:
+      - "5000:5000"
+    volumes: [".:/usr/src/app"]
+    restart: always
+    depends_on:
+     - database
+    environment:
+      ENV: DEVELOPMENT
+      DB_USERNAME: us3r_71ck375
+      DB_PASSWORD: p4ss_71ck375
+      DB_DATABASE: tickets
+      DB_HOST: database
+      DB_PORT: 3306
