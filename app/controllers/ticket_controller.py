@@ -1,9 +1,13 @@
 """Ticket controller"""
 
 from flask import jsonify
+from app.models.ticket_model import TicketModels
 
 class TicketController:
     """Ticket controller class"""
+
+    def __init__(self):
+        self.ticket_model = TicketModels()
 
     def index(self, event_id):
         """Function to get all tickets by an event"""

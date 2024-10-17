@@ -1,13 +1,20 @@
 """Event controller"""
 
 from flask import jsonify
+from app.models.event_models import EventModels
 
 class EventController:
     """Event controller class"""
 
+    def __init__(self):
+        self.event_model = EventModels()
+
     def index(self):
         """Function to get all events"""
-        return jsonify({'success': True, 'data': {"route": "events"}})
+        return jsonify({
+            'success': True, 
+            'data': self.event_model.query.all()
+        })
 
     def show(self, event_id):
         """Function to get an event by id"""
