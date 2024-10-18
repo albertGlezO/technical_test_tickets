@@ -1,9 +1,14 @@
 """Ticket controller"""
+#pylint: disable=E0401
 
-from flask import jsonify
+import uuid
+from sqlalchemy import exc
+from app.controllers.base_controller import BaseController
+from app import db
+from app.models.event_models import EventModels
 from app.models.ticket_model import TicketModels
 
-class TicketController:
+class TicketController(BaseController):
     """Ticket controller class"""
 
     def __init__(self):
@@ -11,12 +16,61 @@ class TicketController:
 
     def index(self, event_id):
         """Function to get all tickets by an event"""
-        return jsonify({'success': True, 'data': {"route": "tickets"}})
+        try:
+            result = []
+            data = self.ticket_model.query.filter_by(event_id=event_id).all()
+            for item in data:
+                data_converted = self.convert_object_to_dict(item)
+                result.append(data_converted)
+            response = self.formatt_response(
+                200, "Success", result
+            )
+        except exc.SQLAlchemyError:
+            response = self.formatt_response(
+                500, "Internal server error", []
+            )
+        return response
 
     def create(self, event_id):
         """Function to buy a tickets of an event"""
-        return jsonify({'success': True, 'data': {"route": "Ticket buy"}})
+        try:
+            event = EventModels().query.filter_by(id=event_id).first()
+            event.total_ticket_sales = event.total_ticket_sales + 1
+            new_ticket = TicketModels(event_id, str(uuid.uuid4()), 0)
+            db.session.add(new_ticket)
+            db.session.commit()
+            response = self.formatt_response(
+                200, "Create successful", {
+                "id": new_ticket.id,
+                "event_id": new_ticket.event_id,
+                "event_name": event.name,
+                "ticket_hash": new_ticket.ticket_hash,
+                "redeem": new_ticket.redeem
+            })
+        except exc.SQLAlchemyError as err:
+            response = self.formatt_response(
+                500, "Internal server error", [err]
+            )
+        return response
 
     def update(self, event_id, ticket_id):
         """Function to redeem a ticket of an event"""
-        return jsonify({'success': True, 'data': {"route": "Ticket redeem"}})
+        try:
+            event = EventModels().query.filter_by(id=event_id).first()
+            event.total_ticket_redeem = event.total_ticket_redeem + 1
+            ticket = self.ticket_model.query.filter_by(id=ticket_id).first()
+            ticket.redeem = 1
+            db.session.commit()
+            response = self.formatt_response(
+                200, "Update successful", {
+                "id": ticket.id,
+                "event_id": ticket.event_id,
+                "event_name": event.name,
+                "ticket_hash": ticket.ticket_hash,
+                "redeem": ticket.redeem
+            })
+        except exc.SQLAlchemyError as err:
+            response = self.formatt_response(
+                500, "Internal server error", [err]
+            )
+        return response
