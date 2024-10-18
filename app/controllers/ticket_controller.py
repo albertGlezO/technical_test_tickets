@@ -49,6 +49,7 @@ class TicketController(BaseController):
                 return self.formatt_response(
                     status_code, message, event
                 )
+            event.total_ticket_sales = event.total_ticket_sales + 1
             new_ticket = TicketModels(event_id, str(uuid.uuid4()), 0)
             db.session.add(new_ticket)
             db.session.commit()
@@ -99,7 +100,5 @@ class TicketController(BaseController):
         """Function to verify the conditional to manage an event"""
         event = self.event_model.query.filter_by(id=event_id).first()
         if not event:
-            return self.formatt_response(
-                400, "Event not found", {}
-            )
+            return 400, "Event not found", {}
         return 200, None, event if return_event else None
