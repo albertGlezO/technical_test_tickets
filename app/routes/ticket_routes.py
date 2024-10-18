@@ -17,7 +17,7 @@ def create(event_id):
     """Function to define the POST method"""
     return controller.create(event_id)
 
-@main.route('/<event_id>/tickets/<ticket_id>', methods=['PATCH'])
+@main.route('/<event_id>/tickets/<ticket_id>/redeem', methods=['PATCH'])
 def update(event_id, ticket_id):
     """Function to define the PATCH method"""
     return controller.update(event_id, ticket_id)
