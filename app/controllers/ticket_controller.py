@@ -2,6 +2,7 @@
 #pylint: disable=E0401
 
 import uuid
+from datetime import datetime
 from sqlalchemy import exc
 from app.controllers.base_controller import BaseController
 from app import db
@@ -14,6 +15,7 @@ class TicketController(BaseController):
     def __init__(self):
         self.ticket_model = TicketModels()
         self.event_model = EventModels()
+        self.event_id = None
 
     def index(self, event_id):
         """Function to get all tickets by an event"""
@@ -43,7 +45,7 @@ class TicketController(BaseController):
         """Function to buy a tickets of an event"""
         try:
             status_code, message, event = self.bussiness_rules(
-                event_id, return_event=True, apply=[1,5]
+                event_id, return_event=True, apply=[1,5,6]
             )
             if status_code not in (200, 201, 202):
                 return self.formatt_response(
@@ -72,7 +74,7 @@ class TicketController(BaseController):
         try:
             ticket = self.ticket_model.query.filter_by(id=ticket_id).first()
             status_code, message, event = self.bussiness_rules(
-                event_id, ticket, return_event=True, apply=[2, 3, 4]
+                event_id, ticket, return_event=True, apply=[2, 3, 4,6]
             )
             if status_code not in (200, 201, 202):
                 return self.formatt_response(
@@ -98,7 +100,13 @@ class TicketController(BaseController):
     #pylint: disable=W0102, R0911
     def bussiness_rules(self, event_id, current_ticket = {}, return_event=False, apply=[1]):
         """Function to verify the conditional to manage an event"""
-        event = self.event_model.query.filter_by(id=event_id).first()
+        self.event_id = event_id
+        event = self.get_event()
+        event_to_datetime = None
+        if event:
+            event_to_datetime = datetime.strptime(
+                str(event.to_datetime), "%Y-%m-%d %H:%M:%S"
+            )
         if 1 in apply and not event:
             return 400, "Event not found", {}
         if 2 in apply and not current_ticket:
@@ -112,4 +120,13 @@ class TicketController(BaseController):
                 "total_tickets": event.total_tickets,
                 "total_ticket_sales": event.total_ticket_sales
             }
+        if 6 in apply and event_to_datetime and event_to_datetime <= datetime.now():
+            return 400, "Invalid operation, event finish", {
+                "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "to_datetime": event_to_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+            }
         return 200, None, event if return_event else None
+
+    def get_event(self):
+        """Function to get the event object by id given"""
+        return self.event_model.query.filter_by(id=self.event_id).first()
