@@ -39,17 +39,17 @@ class TicketController(BaseController):
             )
         return response
 
-    def create(self, event_id):
+    def buy(self, event_id):
         """Function to buy a tickets of an event"""
         try:
             status_code, message, event = self.bussiness_rules(
-                event_id, return_event=True
+                event_id, return_event=True, apply=[1,5]
             )
             if status_code not in (200, 201, 202):
                 return self.formatt_response(
                     status_code, message, event
                 )
-            event.total_ticket_sales = event.total_ticket_sales + 1
+            event.total_ticket_sales = event.total_ticket_sales + 1#pylint:disable=E1101
             new_ticket = TicketModels(event_id, str(uuid.uuid4()), 0)
             db.session.add(new_ticket)
             db.session.commit()
@@ -57,7 +57,7 @@ class TicketController(BaseController):
                 200, "Create successful", {
                 "id": new_ticket.id,
                 "event_id": new_ticket.event_id,
-                "event_name": event.name,
+                "event_name": event.name,#pylint:disable=E1101
                 "ticket_hash": new_ticket.ticket_hash,
                 "redeem": new_ticket.redeem
             })
@@ -67,25 +67,25 @@ class TicketController(BaseController):
             )
         return response
 
-    def update(self, event_id, ticket_id):
+    def redeem(self, event_id, ticket_id):
         """Function to redeem a ticket of an event"""
         try:
+            ticket = self.ticket_model.query.filter_by(id=ticket_id).first()
             status_code, message, event = self.bussiness_rules(
-                event_id, return_event=True
+                event_id, ticket, return_event=True, apply=[2, 3, 4]
             )
             if status_code not in (200, 201, 202):
                 return self.formatt_response(
                     status_code, message, event
                 )
-            event.total_ticket_redeem = event.total_ticket_redeem + 1
-            ticket = self.ticket_model.query.filter_by(id=ticket_id).first()
+            event.total_ticket_redeem = event.total_ticket_redeem + 1#pylint:disable=E1101
             ticket.redeem = 1
             db.session.commit()
             response = self.formatt_response(
                 200, "Update successful", {
                 "id": ticket.id,
                 "event_id": ticket.event_id,
-                "event_name": event.name,
+                "event_name": event.name,#pylint:disable=E1101
                 "ticket_hash": ticket.ticket_hash,
                 "redeem": ticket.redeem
             })
@@ -96,9 +96,20 @@ class TicketController(BaseController):
         return response
 
     #pylint: disable=W0102, R0911
-    def bussiness_rules(self, event_id, current_ticket = {}, return_event=False):
+    def bussiness_rules(self, event_id, current_ticket = {}, return_event=False, apply=[1]):
         """Function to verify the conditional to manage an event"""
         event = self.event_model.query.filter_by(id=event_id).first()
-        if not event:
+        if 1 in apply and not event:
             return 400, "Event not found", {}
+        if 2 in apply and not current_ticket:
+            return 400, "Ticket not found", {}
+        if 3 in apply and current_ticket and int(current_ticket.event_id) != int(event_id):
+            return 400, "Invalid operation, ticket is not from the event", {}
+        if 4 in apply and current_ticket and int(current_ticket.redeem) == 1:
+            return 400, "Invalid operation", {"redeem": 1}
+        if 5 in apply and int(event.total_tickets) <= int(event.total_ticket_sales):
+            return 400, "Invalid operation, sold out", {
+                "total_tickets": event.total_tickets,
+                "total_ticket_sales": event.total_ticket_sales
+            }
         return 200, None, event if return_event else None
