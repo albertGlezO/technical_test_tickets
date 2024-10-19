@@ -8,7 +8,9 @@ class BaseController:
 
     def convert_object_to_dict(self, item):
         """Funtion to convert an object to dictionary"""
-        item.__dict__.pop("_sa_instance_state")
+        item_formatted = item.__dict__
+        if "_sa_instance_state" in item_formatted:
+            item.__dict__.pop("_sa_instance_state")
         return item.__dict__
 
     def formatt_response(self, status_code, message, data):
