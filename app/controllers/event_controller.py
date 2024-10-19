@@ -14,7 +14,7 @@ class EventController(BaseController):
     def __init__(self):
         self.event_model = EventModels()
         self.min_tickets = 1
-        self.max_tickets = 300
+        self.max_tickets = 301
 
     def index(self):
         """Function to get all events"""
@@ -200,7 +200,7 @@ class EventController(BaseController):
                 "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "to_datetime": curremt_to_datetime,
             }
-        if 7 in apply and int(current_event.total_ticket_sales) > 0:
+        if 7 in apply and current_event and int(current_event.total_ticket_sales) > 0:
             return 400, "Invalid operation, there are ticket sales", {
                 "total_ticket_sales": int(current_event.total_ticket_sales)
             }
