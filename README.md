@@ -76,12 +76,12 @@ Para realizar la ejecución de las pruebas unitarias sera con el siguiente coman
 python -m unittest app/test/unit/*.py
 ```
 
-Como resultado mostrara la cantidad de pruebas ejecutadas y cuantas fueron exitosas
+Como resultado mostrara la cantidad de pruebas ejecutadas
 
 ```bash
 ............
 ----------------------------------------------------------------------
-Ran 12 tests in 0.400s
+Ran 29 tests in 0.400s
 
 OK
 ```
