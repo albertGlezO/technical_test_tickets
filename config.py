@@ -13,23 +13,29 @@ class SystemConfig:#pylint: disable=R0903
 class DevelopmentConfig(SystemConfig):#pylint: disable=R0903
     """Development configuration class"""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = (
-        "mysql+pymysql://" + os.environ["DB_USERNAME"] + ":"  \
-        + os.environ["DB_PASSWORD"] + "@" \
-        + os.environ["DB_HOST"] + ":" \
-        + os.environ["DB_PORT"] + "/" \
-        + os.environ["DB_DATABASE"]
-    )
-    click.echo(SQLALCHEMY_DATABASE_URI)
+    try:
+        SQLALCHEMY_DATABASE_URI = (
+            "mysql+pymysql://" + os.environ["DB_USERNAME"] + ":"  \
+            + os.environ["DB_PASSWORD"] + "@" \
+            + os.environ["DB_HOST"] + ":" \
+            + os.environ["DB_PORT"] + "/" \
+            + os.environ["DB_DATABASE"]
+        )
+        click.echo(SQLALCHEMY_DATABASE_URI)
+    except KeyError:
+        SQLALCHEMY_DATABASE_URI = ""
 
 
 class TestingConfig(SystemConfig):#pylint: disable=R0903
     """Testing cnfiguration class"""
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = (
-        "mysql+pymysql://" + os.environ["DB_USERNAME"] + ":" \
-        + os.environ["DB_PASSWORD"] + "@" \
-        + os.environ["DB_HOST"] + ":" \
-        + os.environ["DB_PORT"] + "/" \
-        + os.environ["DB_DATABASE"]
-    )
+    try:
+        SQLALCHEMY_DATABASE_URI = (
+            "mysql+pymysql://" + os.environ["DB_USERNAME"] + ":" \
+            + os.environ["DB_PASSWORD"] + "@" \
+            + os.environ["DB_HOST"] + ":" \
+            + os.environ["DB_PORT"] + "/" \
+            + os.environ["DB_DATABASE"]
+        )
+    except KeyError:
+        SQLALCHEMY_DATABASE_URI = ""
