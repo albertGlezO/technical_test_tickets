@@ -76,7 +76,7 @@ Para realizar la ejecución de las pruebas unitarias sera con el siguiente coman
 python -m unittest app/test/unit/*.py
 ```
 
-Como resultado mostrara la cantidad de pruebas ejecutadas
+Como resultado mostrara la cantidad de pruebas ejecutadas y su estatus
 
 ```bash
 ............
