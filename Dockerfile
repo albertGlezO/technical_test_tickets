@@ -17,4 +17,4 @@ COPY . /usr/src/app
 EXPOSE 5000
 
 # Run de application
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+CMD ["python", "-m", "flask", "--app", "run.py", "run", "--host=0.0.0.0"]
