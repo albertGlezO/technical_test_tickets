@@ -148,7 +148,7 @@ class EventController(BaseController):
     def bussiness_rules(self, params, current_event = {}, apply=[1,2,3,4,5]):
         """
             Function to verify the conditional to manage an event
-            - Verify maximum ticket limit
+            - Verify total of tickets allowed
             - Verify invalid start date event
             - Verify invalid range dates
             - Verify length of time in event
@@ -177,11 +177,11 @@ class EventController(BaseController):
             }
         if 2 in apply and from_datetime < datetime.now():
             return 400, "Invalid start date event", {
-                "current_datetime": datetime.now(),
+                "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "from_datetime": from_datetime
             }
         if 3 in apply and from_datetime > to_datetime:
-            return 400, "Invalid range dates", {
+            return 400, "Invalid date range", {
                 "from_datetime": from_datetime,
                 "to_datetime": to_datetime
             }
@@ -191,13 +191,13 @@ class EventController(BaseController):
                 "to_datetime": to_datetime
             }
         if 5 in apply and params["total_tickets"] < int(current_event.total_ticket_sales):
-            return 400, "Invalid operation, there are more ticket sales", {
+            return 400, "Invalid operation, there are ticket sales", {
                 "total_tickets": params["total_tickets"],
                 "total_ticket_sales": int(current_event.total_ticket_sales)
             }
         if 6 in apply and curremt_to_datetime and curremt_to_datetime > datetime.now():
             return 400, "Invalid operation, unfinished event", {
-                "current_datetime": datetime.now(),
+                "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "to_datetime": curremt_to_datetime,
             }
         if 7 in apply and int(current_event.total_ticket_sales) > 0:
