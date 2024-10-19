@@ -24,8 +24,10 @@ services:
      - "3307:3306"
    expose:
      - "3306"
-   volumes:
-     - tickets-db:/var/lib/mysql
+   volumes: [
+      "tickets-db:/var/lib/mysql", 
+      "./tickets-db:/usr/local/mysql"
+    ]
 
   server:
     container_name: tickets
