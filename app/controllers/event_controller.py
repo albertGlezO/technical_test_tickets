@@ -13,6 +13,7 @@ class EventController(BaseController):
 
     def __init__(self):
         self.event_model = EventModels()
+        self.min_tickets = 1
         self.max_tickets = 300
 
     def index(self):
@@ -169,9 +170,10 @@ class EventController(BaseController):
             curremt_to_datetime = datetime.strptime(
                 str(current_event.to_datetime), "%Y-%m-%d %H:%M:%S"
             )
-        if 1 in apply and params["total_tickets"] > self.max_tickets:
-            return 400, "Maximum ticket limit", {
-                "max_total_tickets": self.max_tickets
+        if 1 in apply and params["total_tickets"] not in range(self.min_tickets, self.max_tickets):
+            return 400, "Invalid operation, allow 1 to 300 tickets", {
+                "min_tickets": self.min_tickets,
+                "max_tickets": self.max_tickets
             }
         if 2 in apply and from_datetime < datetime.now():
             return 400, "Invalid start date event", {
