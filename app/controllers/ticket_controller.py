@@ -74,7 +74,7 @@ class TicketController(BaseController):
         try:
             ticket = self.ticket_model.query.filter_by(id=ticket_id).first()
             status_code, message, event = self.bussiness_rules(
-                event_id, ticket, return_event=True, apply=[2, 3, 4,6]
+                event_id, ticket, return_event=True, apply=[2, 3, 4, 6, 7]
             )
             if status_code not in (200, 201, 202):
                 return self.formatt_response(
@@ -102,8 +102,12 @@ class TicketController(BaseController):
         """Function to verify the conditional to manage an event"""
         self.event_id = event_id
         event = self.get_event()
+        event_from_datetime = None
         event_to_datetime = None
         if event:
+            event_from_datetime = datetime.strptime(
+                str(event.from_datetime), "%Y-%m-%d %H:%M:%S"
+            )
             event_to_datetime = datetime.strptime(
                 str(event.to_datetime), "%Y-%m-%d %H:%M:%S"
             )
@@ -124,6 +128,11 @@ class TicketController(BaseController):
             return 400, "Invalid operation, event finish", {
                 "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "to_datetime": event_to_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        if 7 in apply and event_from_datetime and event_from_datetime > datetime.now():
+            return 400, "Invalid operation, event has not started", {
+                "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "from_datetime": event_from_datetime.strftime("%Y-%m-%d %H:%M:%S"),
             }
         return 200, None, event if return_event else None
 

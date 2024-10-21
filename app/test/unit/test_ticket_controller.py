@@ -219,6 +219,48 @@ class TestTicketController(TestCase):
             data
         )
 
+    def test_13_event_has_not_started(self):
+        """ Function to verify the bussiness rules
+            - Check if the event finished
+        """
+        yesterday = datetime.now()-timedelta(days=1)
+        tomorrow = datetime.now()+timedelta(days=1)
+        current_event = copy(self.current_event)
+        current_event.from_datetime = yesterday.strftime("%Y-%m-%d %H:%M:%S")
+        current_event.to_datetime = tomorrow.strftime("%Y-%m-%d %H:%M:%S")
+        self.controller.get_event = MagicMock(return_value=current_event)
+        status_code, message, data = (
+            self.controller.bussiness_rules(
+                self.event_id, apply=[7]
+            )
+        )
+        self.assertEqual(200, status_code)
+        self.assertEqual(None, message)
+        self.assertEqual(None, data)
+
+    def test_14_event_has_not_started(self):
+        """ Function to verify the bussiness rules
+            - Check if the event finished
+        """
+        tomorrow = datetime.now()+timedelta(days=1)
+        next_week = datetime.now()+timedelta(days=7)
+        current_event = copy(self.current_event)
+        current_event.from_datetime = tomorrow.strftime("%Y-%m-%d %H:%M:%S")
+        current_event.to_datetime = next_week.strftime("%Y-%m-%d %H:%M:%S")
+        self.controller.get_event = MagicMock(return_value=current_event)
+        status_code, message, data = (
+            self.controller.bussiness_rules(
+                self.event_id, apply=[7]
+            )
+        )
+        self.assertEqual(400, status_code)
+        self.assertEqual(self.__load_fail_messages()[7], message)
+        self.assertDictEqual(
+            {"current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "from_datetime": tomorrow.strftime("%Y-%m-%d %H:%M:%S")},
+            data
+        )
+
     def __load_current_event(self):
         fake = Faker()
         return EventModels(
@@ -243,5 +285,6 @@ class TestTicketController(TestCase):
             3 : "Invalid operation, ticket is not from the event",
             4 : "Invalid operation",
             5 : "Invalid operation, sold out",
-            6 : "Invalid operation, event finish"
+            6 : "Invalid operation, event finish",
+            7 : "Invalid operation, event has not started"
         }

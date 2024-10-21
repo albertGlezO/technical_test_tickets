@@ -81,7 +81,7 @@ Como resultado mostrara la cantidad de pruebas ejecutadas y su estatus
 ```bash
 ............
 ----------------------------------------------------------------------
-Ran 29 tests in 0.400s
+Ran 31 tests in 0.400s
 
 OK
 ```

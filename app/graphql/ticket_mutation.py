@@ -50,7 +50,7 @@ class RedeemTicketMutation(graphene.Mutation):
         """Function to create the resource"""
         ticket = TicketModels().query.filter_by(id=ticket_id).first()
         response, event = BussinessRulesTicket().bussiness_rules(
-            event_id, ticket, return_event=True, apply=[2, 3, 4, 6]
+            event_id, ticket, return_event=True, apply=[2, 3, 4, 6, 7]
         )
         if response:
             raise GraphQLError(response)
@@ -65,8 +65,12 @@ class BussinessRulesTicket:#pylint: disable=R0903
     def bussiness_rules(self, event_id, current_ticket = {}, return_event=False, apply=[1]):
         """Function to verify the conditional to manage an event"""
         event = EventModels().query.filter_by(id=event_id).first()
+        event_from_datetime = None
         event_to_datetime = None
         if event:
+            event_from_datetime = datetime.strptime(
+                str(event.from_datetime), "%Y-%m-%d %H:%M:%S"
+            )
             event_to_datetime = datetime.strptime(
                 str(event.to_datetime), "%Y-%m-%d %H:%M:%S"
             )
@@ -82,4 +86,6 @@ class BussinessRulesTicket:#pylint: disable=R0903
             return "Invalid operation, sold out", None
         if 6 in apply and event_to_datetime and event_to_datetime <= datetime.now():
             return "Invalid operation, event finish", None
+        if 7 in apply and event_from_datetime and event_from_datetime > datetime.now():
+            return "Invalid operation, event has not started", None
         return None, event if return_event else None
