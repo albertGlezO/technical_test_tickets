@@ -1,5 +1,3 @@
-CREATE DATABASE `tickets`;
-
 USE `tickets`;
 
 CREATE TABLE `events` (
