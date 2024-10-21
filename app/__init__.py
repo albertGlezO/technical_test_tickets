@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_graphql import GraphQLView
 from .database import mysql_db
 
 db = SQLAlchemy()
@@ -19,6 +20,16 @@ def create_app():
     app.config.from_object(mysql_db.get_connection())
 
     db.init_app(app)
+
+    from app.schemas.schema import schema
+    app.add_url_rule(
+        '/graphql',
+        view_func=GraphQLView.as_view(
+            'graphql',
+        schema=schema,
+        graphiql=True
+        )
+    )
 
     with app.app_context():
         from .routes import event_routes, ticket_routes
