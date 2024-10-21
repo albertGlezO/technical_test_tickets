@@ -261,6 +261,7 @@ class TestEventController(unittest.TestCase):
             "to_datetime": tomorrow.strftime("%Y-%m-%d %H:%M:%S")
         })
         current_event = self.__load_current_event()
+        current_event.total_ticket_sales = 100
         curremt_to_datetime = datetime.strptime(
             str(current_event.to_datetime), "%Y-%m-%d %H:%M:%S"
         )
@@ -277,7 +278,7 @@ class TestEventController(unittest.TestCase):
             data,
         )
 
-    def test_14_unfinish_event(self):
+    def test_14_there_are_ticket_sales(self):
         """ Function to verify the bussiness rules
             - Check if there are ticke sales
         """
@@ -292,11 +293,15 @@ class TestEventController(unittest.TestCase):
         self.assertEqual(None, message)
         self.assertEqual(None, data)
 
-    def test_15_unfinish_event_fail(self):
+    def test_15_there_are_ticket_sales_fail(self):
         """ Function to verify the bussiness rules
             - Check if there are ticke sales
         """
+        yesterday = datetime.now()-timedelta(days=1)
+        tomorrow = datetime.now()+timedelta(days=1)
         current_event = self.__load_current_event()
+        current_event.from_datetime = yesterday.strftime("%Y-%m-%d %H:%M:%S"),
+        current_event.to_datetime = tomorrow.strftime("%Y-%m-%d %H:%M:%S")
         current_event.total_ticket_sales = 10
         status_code, message, data = (
             self.controller.bussiness_rules(
