@@ -594,3 +594,10 @@ mutation {
     }
 }
 ```
+
+### GraphQL IDE
+Cuando el servidor se este corriendo, es posible acceder al GraphQL IDE por medio de la siguiente URL en el navegador
+```bash
+http://127.0.0.1:5000/graphql
+```
+![](utils/GraphiQL.png)
