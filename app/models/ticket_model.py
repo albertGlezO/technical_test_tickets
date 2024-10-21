@@ -10,7 +10,7 @@ class TicketModels(db.Model):
     """Ticket Models Class"""
     __tablename__ = "tickets"
 
-    def __init__(self, event_id=None, ticket_hash=None, redeem=None):
+    def __init__(self, event_id=None, ticket_hash=None, redeem=0):
         self.event_id = event_id
         self.ticket_hash = ticket_hash
         self.redeem = redeem
