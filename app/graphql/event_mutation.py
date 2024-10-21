@@ -132,7 +132,11 @@ class BussinessRulesEvent:
         if 5 in apply and params["total_tickets"] < int(current_event.total_ticket_sales):
             return "Invalid operation, there are ticket sales"
         if 6 in apply and curremt_to_datetime and curremt_to_datetime > datetime.now():
+            if int(current_event.total_ticket_sales) == 0:
+                return None
             return "Invalid operation, unfinished event"
         if 7 in apply and current_event and int(current_event.total_ticket_sales) > 0:
+            if curremt_to_datetime < datetime.now():
+                return None
             return "Invalid operation, there are ticket sales"
         return None

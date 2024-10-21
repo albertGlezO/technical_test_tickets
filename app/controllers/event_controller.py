@@ -196,11 +196,15 @@ class EventController(BaseController):
                 "total_ticket_sales": int(current_event.total_ticket_sales)
             }
         if 6 in apply and curremt_to_datetime and curremt_to_datetime > datetime.now():
+            if int(current_event.total_ticket_sales) == 0:
+                return 200, None, None
             return 400, "Invalid operation, unfinished event", {
                 "current_datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "to_datetime": curremt_to_datetime,
             }
         if 7 in apply and current_event and int(current_event.total_ticket_sales) > 0:
+            if curremt_to_datetime < datetime.now():
+                return 200, None, None
             return 400, "Invalid operation, there are ticket sales", {
                 "total_ticket_sales": int(current_event.total_ticket_sales)
             }
