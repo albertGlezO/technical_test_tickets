@@ -43,12 +43,20 @@ exit
     │   │   └── ticket_controller.py
     │   ├── database
     │   │   └── mysql_db.py
+    │   ├── graphql
+    │   │   ├── event_mutation.py
+    │   │   ├── mutation.py
+    │   │   ├── object.py
+    │   │   ├── query.py
+    │   │   └── ticket_mutation.py
     │   ├── models
     │   │   ├── event_models.py
     │   │   └── ticket_models.py
     │   ├── routes
     │   │   ├── event_routes.py
     │   │   └── ticket_routes.py
+    │   ├── schemas
+    │   └── schema.py
     │   ├── test
     │   │   ├── unit
     │   │   │   ├── test_event_constroller.py
