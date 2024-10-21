@@ -73,7 +73,7 @@ exit
 Para realizar la ejecución de las pruebas unitarias sera con el siguiente comando
 
 ```bash
-python -m unittest app/test/unit/*.py
+python3.11 -m unittest app/test/unit/*.py
 ```
 
 Como resultado mostrara la cantidad de pruebas ejecutadas y su estatus
@@ -89,7 +89,7 @@ OK
 ## REST API
 A continuación se describen los servicios rest contenidos
 
-### Obtener todos los eventos
+### Obtener todos los eventos y sus boletos
 
 #### Petición
 ```bash
@@ -118,7 +118,7 @@ curl --location 'http://127.0.0.1:5000/events'
 }
 ```
 
-### Obtener un evento
+### Obtener un evento y sus boletos
 
 #### Petición
 ```bash
@@ -305,6 +305,292 @@ curl --location --request PATCH 'http://127.0.0.1:5000/events/{event_id}/tickets
         "event_name": "Gran premio de mexico",
         "ticket_hash": "cd2e3787-9afc-45ba-802f-093819fd7010",
         "redeem": 1
+    }
+}
+```
+
+## GRAPHQL
+A continuación se describe el servicio, con las diferentes queries para realizar las acciones por medio de GraphQL.
+
+#### Petición
+```bash
+POST /graphql
+```
+
+### Obtener todos los eventos y sus boletos
+
+#### Consulta
+```bash
+{
+  events{
+    name
+    fromDatetime
+    toDatetime
+    totalTickets
+    totalTicketSales
+    totalTicketRedeem
+    tickets {
+      id
+      ticketHash
+      redeem
+    }
+  }
+}
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "events": [
+            {
+                "name": "Event GraphQL NEW",
+                "fromDatetime": "2024-10-25T13:00:00",
+                "toDatetime": "2024-10-30T20:00:00",
+                "totalTickets": 300,
+                "totalTicketSales": 9,
+                "totalTicketRedeem": 6,
+                "tickets": [
+                    {
+                        "id": "VGlja2V0OjE=",
+                        "ticketHash": "cd2e3787-9afc-45ba-802f-093819fd7010",
+                        "redeem": 1
+                    },
+                    {
+                        "id": "VGlja2V0OjI=",
+                        "ticketHash": "beda18ab-23d9-4057-b272-62ffbcc02d48",
+                        "redeem": 1
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+### Obtener un evento y sus boletos
+
+#### Consulta
+```bash
+{
+  events(id:"1"){
+    name
+    fromDatetime
+    toDatetime
+    totalTickets
+    totalTicketSales
+    totalTicketRedeem
+    tickets {
+      id
+      ticketHash
+      redeem
+    } 
+  }
+}
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "events": [
+            {
+                "name": "Event GraphQL NEW",
+                "fromDatetime": "2024-10-25T13:00:00",
+                "toDatetime": "2024-10-30T20:00:00",
+                "totalTickets": 300,
+                "totalTicketSales": 9,
+                "totalTicketRedeem": 6,
+                "tickets": [
+                    {
+                        "id": "VGlja2V0OjE=",
+                        "ticketHash": "cd2e3787-9afc-45ba-802f-093819fd7010",
+                        "redeem": 1
+                    },
+                    {
+                        "id": "VGlja2V0OjI=",
+                        "ticketHash": "beda18ab-23d9-4057-b272-62ffbcc02d48",
+                        "redeem": 1
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+### Crear un evento
+
+
+#### Consulta
+```bash
+mutation {
+  mutateCreateEvent(
+    name:"Event GraphQL NEW",
+    fromDatetime:"2024-10-25 13:00:00",
+    toDatetime: "2024-10-30 20:00:00",
+    totalTickets: 200
+  ){
+    event{
+      name
+    	fromDatetime
+    	toDatetime
+    	totalTickets
+    }
+  }
+}
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "mutateCreateEvent": {
+            "event": {
+                "name": "Event GraphQL NEW",
+                "fromDatetime": "2024-10-25T13:00:00",
+                "toDatetime": "2024-10-30T20:00:00",
+                "totalTickets": 200
+            }
+        }
+    }
+}
+```
+
+### Actualizar un evento
+
+#### Consulta
+```bash
+mutation {
+  mutateUpdateEvent(
+    eventId: 1
+    name:"Event GraphQL NEW",
+    fromDatetime:"2024-10-25 13:00:00",
+    toDatetime: "2024-10-30 20:00:00",
+    totalTickets: 300
+  ){
+    event {
+      name
+      fromDatetime
+      toDatetime
+      totalTickets
+    }
+  }
+}
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "mutateUpdateEvent": {
+            "event": {
+                "name": "Event GraphQL NEW",
+                "fromDatetime": "2024-10-25T13:00:00",
+                "toDatetime": "2024-10-30T20:00:00",
+                "totalTickets": 300
+            }
+        }
+    }
+}
+```
+### Eliminar un evento
+
+#### Consulta
+```bash
+mutation {
+  mutateDeleteEvent(
+    eventId: 7
+  ){
+  	event{
+    	name
+      fromDatetime
+      toDatetime
+      totalTickets
+      totalTicketSales
+  	}
+  }
+}
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "mutateDeleteEvent": {
+            "event": {
+                "name": "Event GraphQL NEW",
+                "fromDatetime": "2024-10-20T13:00:00",
+                "toDatetime": "2024-10-20T20:00:00",
+                "totalTickets": 200,
+                "totalTicketSales": 0
+            }
+        }
+    }
+}
+```
+
+### Comprar boleto de un evento
+
+#### Consulta
+```bash
+mutation {
+  mutateBuyTicket(
+    eventId: 1
+  ){
+    ticket{
+      eventId
+      ticketHash
+      redeem
+    }
+  }
+} 
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "mutateBuyTicket": {
+            "ticket": {
+                "eventId": 1,
+                "ticketHash": "62d18b3f-5d96-4700-b0c3-89238010a832",
+                "redeem": 0
+            }
+        }
+    }
+}
+```
+
+### Canjear boleto de evento
+
+#### Consulta
+```bash
+mutation {
+  mutateRedeemTicket(
+    eventId: 1,
+    ticketId: 10
+  ){
+    ticket{
+      eventId
+      ticketHash
+      redeem
+    }
+  }
+}  
+```
+
+#### Respuesta
+```bash
+{
+    "data": {
+        "mutateRedeemTicket": {
+            "ticket": {
+                "eventId": 1,
+                "ticketHash": "62d18b3f-5d96-4700-b0c3-89238010a832",
+                "redeem": 1
+            }
+        }
     }
 }
 ```
