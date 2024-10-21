@@ -155,9 +155,9 @@ curl --location 'http://127.0.0.1:5000/events' \
 --header 'Content-Type: application/json' \
 --data '{
     "to_datetime": "2024-10-27 20:00:00",
-    "from_datetime": "2024-10-25 08:00:00"
+    "from_datetime": "2024-10-25 08:00:00",
     "name": "Gran premio de mexico",
-    "total_tickets": 200,
+    "total_tickets": 200
 }'
 ```
 
