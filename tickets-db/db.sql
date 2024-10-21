@@ -20,5 +20,5 @@ CREATE TABLE `tickets` (
   `redeem` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `tickets_FK` (`event_id`),
-  CONSTRAINT `tickets_FK` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`)
+  CONSTRAINT `tickets_FK` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
